@@ -1,0 +1,13 @@
+extends layout
+
+block content
+
+ h1
+  a(href="/") Ablefit
+
+ p Click the button below to authorize this application to use your Fitbit data.
+
+ p <a href="#{pageData.authUrl}" class="button">Callback</a>
+
+ #footer
+  a(href="http://corygrunk.com", target="_blank") Cory coded it.

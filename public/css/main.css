@@ -1,0 +1,48 @@
+html body {
+  background-color: #eee;
+  margin: 0;
+  text-align: center;
+  font-family: Lato, Helvetica, Arial, sans-serif;
+}
+html body h1 {
+  padding: 30px;
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  text-align: center;
+  background: #333;
+  color: #FFF;
+}
+html body h1 a {
+  text-decoration: none;
+  color: #FFF;
+}
+html body h1 a:hover {
+  text-decoration: underline;
+}
+html a.button {
+  display: inline-block;
+  margin: 30px 0;
+  background: #333;
+  color: #fff;
+  font-size: 12px;
+  padding: 15px 50px;
+  text-decoration: none;
+}
+html a.button:hover {
+  background: #666;
+}
+html #footer {
+  font-size: 11px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 30px;
+}
+html #footer a {
+  font-size: 11px;
+  text-decoration: none;
+  color: #CCC;
+}

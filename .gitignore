@@ -1,0 +1,48 @@
+.tmp
+
+# Environment
+.env
+
+# Logs
+logs
+*.log
+log.txt
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.DS_store*
+
+# Code coverage analysis
+lib-cov
+test/coverage/*
+test/coverage.html
+
+# Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
+.grunt
+
+#Coverage and Test Reports
+test/coverage/*
+unit.xml
+acceptance.xml
+integration.xml
+integration-acceptance.xml
+smoke.xml
+report.xml
+
+# Dependency directory
+# Deployed apps should consider commenting this line out:
+# see https://npmjs.org/doc/faq.html#Should-I-check-my-node_modules-folder-into-git
+# Node dependencies
+node_modules
+.npm
+npm-shrinkwrap.json
+build/Release
+
+#Bower
+component.json
+bower_components
+
+newrelic_agent.log
+nohup.out
