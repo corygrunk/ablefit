@@ -102,8 +102,12 @@ app.use('/api/:token', function (req, res, next) {
   var obj = {};
   obj.access_token = req.params.token;
   getHeartrate(obj, function (heartrate) {
-    currentHeartrate = heartrate.user.age;
-    next();
+    if(heartrate.hasOwnProperty("user")){
+      currentHeartrate = heartrate.user.age;
+      next();
+    } else {
+      next();
+    }
   });
 });
 
@@ -120,7 +124,7 @@ app.get('/callback', function (req, res) {
 
 app.get("/api/:token",function(req, res){
   res.setHeader("Content-Type", "application/json");
-  res.send(JSON.stringify({ "heartrate": currentHeartrate }));
+  res.send(JSON.stringify({ heartrate : currentHeartrate }));
 });
 
 app.listen(3000, function () {

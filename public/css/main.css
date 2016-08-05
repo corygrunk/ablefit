@@ -13,7 +13,7 @@ pre {
   padding: 15px;
   margin: 15px auto;
   border: 1px solid #ccc;
-  background-color: #efefef;
+  background-color: #fefefe;
   display: block;
   max-width: 600px;
   overflow: scroll;
@@ -21,9 +21,10 @@ pre {
 html body h1 {
   padding: 30px;
   margin: 0 0 20px 0;
-  font-size: 18px;
+  font-size: 24px;
   font-weight: 300;
-  letter-spacing: 1px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
   text-align: center;
   background: #333;
   color: #FFF;
@@ -40,7 +41,7 @@ html a.button {
   margin: 30px 0;
   background: #333;
   color: #fff;
-  font-size: 12px;
+  font-size: 14px;
   padding: 15px 50px;
   text-decoration: none;
 }
