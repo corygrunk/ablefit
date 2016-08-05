@@ -11,15 +11,17 @@ var apiLink = "";
 var getUrlToken = "";
 
 var port = process.env.PORT || 8080;
-var siteUrl = process.env.SITEURL + ":" + port || "https://ablefit.herokuapp.com";
+var siteUrl = "";
 var userAuthUrl = "";
 var getTokenDataString = "";
 
 var envionmentCheck = function () {
   if (process.env.SITEURL) {
+    siteUrl = process.env.SITEURL + ":" + port;
     userAuthUrl = "https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=" + process.env.CLIENT_ID + "&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&scope=heartrate%20profile%20weight&expires_in=604800";
     getTokenDataString = "clientId=" + process.env.CLIENT_ID + "&grant_type=authorization_code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&code=";
   } else {
+    siteUrl = "https://ablefit.herokuapp.com";
     userAuthUrl = "https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=" + process.env.CLIENT_ID + "&redirect_uri=https%3A%2F%2Fablefit.herokuapp.com%2Fcallback&scope=heartrate%20profile%20weight&expires_in=604800";
     getTokenDataString = "clientId=" + process.env.CLIENT_ID + "&grant_type=authorization_code&redirect_uri=https%3A%2F%2Fablefit.herokuapp.com%2Fcallback&code=";
   }
