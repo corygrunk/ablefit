@@ -5,12 +5,12 @@ var express = require('express');
 var app = express();
 var request = require('request');
 var url = require('url');
+var http = require('http');
 
-var clientToken = "";
+var apiLink = "";
+var getUrlToken = "";
 
-var userId = "",
-    accessToken = "",
-    refreshToken = "";
+var siteUrl = "http://localhost:3000";
 
 var userAuthUrl = "https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=" + process.env.CLIENT_ID +
 "&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&scope=heartrate%20profile%20weight&expires_in=604800";
@@ -25,7 +25,7 @@ app.use(express.static(__dirname + '/public'));
 
 
 // GET USER TOKENS
-var getUserTokens = function () {
+var getUserTokens = function (callback) {
   var headers = {
     'Authorization': 'Basic ' + process.env.CLIENT_AUTH,
     'Content-Type': 'application/x-www-form-urlencoded'
@@ -37,38 +37,37 @@ var getUserTokens = function () {
       headers: headers,
       body: dataString
   };
-  function callback(error, response, body) {
+  function callback1(error, response, body) {
       if (!error && response.statusCode == 200) {
-          userId = JSON.parse(body).user_id;
-          accessToken = JSON.parse(body).access_token;
-          refreshToken = JSON.parse(body).refresh_token;
+        callback(JSON.parse(body));
       } else {
         console.log(body);
+        callback(JSON.parse(body));
       }
   }
-  request(options, callback);
+  request(options, callback1);
 };
 
 
 // MAKE REQUEST
-var getHeartrate = function () {
+var getHeartrate = function (obj, callback) {
   var headers = {
-      'Authorization': 'Bearer ' + accessToken
+      'Authorization': 'Bearer ' + obj.access_token
     },
     options = {
       url: apiEndpoint,
       headers: headers
     };
-  function callback(error, response, body) {
+  function callback2(error, response, body) {
       if (!error && response.statusCode == 200) {
-          console.log(JSON.parse(body));
-          currentHeartrate = JSON.parse(body).user.age;
+        var bodyObj = JSON.parse(body);
+        bodyObj.user.access_token = obj.access_token;
+        callback(bodyObj);
       } else {
-        console.log(body);
-        currentHeartrate = 'Error connecting to Fitbit. Try re-authenicating.';
+        callback(JSON.parse(body));
       }
   }
-  request(options, callback);
+  request(options, callback2);
 };
 
 var parseUrlForClientToken = function (url) {
@@ -76,6 +75,37 @@ var parseUrlForClientToken = function (url) {
   clientToken = s[1];
 };
 
+
+// EXPRESS MIDDLEWARE
+
+app.use('/callback', function (req, res, next) {
+  // console.log('Request Type:', req.method);
+  parseUrlForClientToken(req.originalUrl);
+  getUserTokens(function (obj) {
+    getHeartrate(obj, function (heartrate) {
+      if(heartrate.hasOwnProperty("user")){
+        apiMsg = "You're authenticated. You can make requests from MAX/MSP to this URL:";
+        apiLink = siteUrl + "/api/" + heartrate.user.access_token;
+        apiDetails = "The API returns your current heart rate. It updates every 30 seconds.";
+        next();
+      } else {
+        apiMsg = "Uh oh, something went wrong. Try returning to the homepage and re-authenticating.";
+        apiLink = siteUrl;
+        apiDetails = "";
+        next();
+      }
+    });
+  });
+});
+
+app.use('/api/:token', function (req, res, next) {
+  var obj = {};
+  obj.access_token = req.params.token;
+  getHeartrate(obj, function (heartrate) {
+    currentHeartrate = heartrate.user.age;
+    next();
+  });
+});
 
 
 // EXPRESS SERVER
@@ -85,10 +115,12 @@ app.get('/', function (req, res) {
 });
 
 app.get('/callback', function (req, res) {
-  parseUrlForClientToken(req.originalUrl);
-  getUserTokens();
-  getHeartrate();
-  res.render('callback.jade', {pageData: { heartrate : currentHeartrate}});
+  res.render('callback.jade', {pageData: { message : apiMsg, link : apiLink, details : apiDetails }});
+});
+
+app.get("/api/:token",function(req, res){
+  res.setHeader("Content-Type", "application/json");
+  res.send(JSON.stringify({ "heartrate": currentHeartrate }));
 });
 
 app.listen(3000, function () {

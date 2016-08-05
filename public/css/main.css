@@ -4,6 +4,20 @@ html body {
   text-align: center;
   font-family: Lato, Helvetica, Arial, sans-serif;
 }
+p {
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 180%;
+}
+pre {
+  padding: 15px;
+  margin: 15px auto;
+  border: 1px solid #ccc;
+  background-color: #efefef;
+  display: block;
+  max-width: 600px;
+  overflow: scroll;
+}
 html body h1 {
   padding: 30px;
   margin: 0 0 20px 0;
