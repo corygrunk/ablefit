@@ -9,6 +9,7 @@ var http = require('http');
 
 var apiLink = "";
 var getUrlToken = "";
+var clientToken = "";
 
 // PROD ENV
 var siteUrl = "http://ablefit.herokuapp.com";
