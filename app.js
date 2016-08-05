@@ -95,7 +95,8 @@ app.use('/callback', function (req, res, next) {
         if(heartrate.hasOwnProperty("user")){
           apiMsg = "You're authenticated. You can make requests from MAX/MSP to this URL:";
           apiLink = siteUrl + "/api/" + heartrate.user.access_token;
-          apiDetails = "The API returns your current heart rate. It updates every 30 seconds.";
+          apiDetails = "The API returns your current heart rate. It updates every 30 seconds. Don't hit it more than that.";
+          console.log('siteUrl: ' + siteUrl);
           next();
         } else {
           apiMsg = "Uh oh, something went wrong. Try returning to the homepage and re-authenticating.";
