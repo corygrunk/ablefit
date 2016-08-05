@@ -11,6 +11,7 @@ var apiLink = "";
 var getUrlToken = "";
 var clientToken = "";
 
+var port = process.env.PORT || 8080;
 // PROD ENV
 var siteUrl = "http://ablefit.herokuapp.com";
 // DEV ENV
@@ -139,6 +140,6 @@ app.get("/api/:token",function(req, res){
   res.send(JSON.stringify({ heartrate : currentHeartrate }));
 });
 
-app.listen(3000, function () {
-  console.log('Listening on port 3000.');
+app.listen(port, function () {
+  console.log('Listening on port ' + port + '.');
 });
