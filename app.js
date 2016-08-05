@@ -11,7 +11,7 @@ var apiLink = "";
 var getUrlToken = "";
 
 var port = process.env.PORT || 8080;
-var siteUrl = process.env.SITEURL + ":" + port || "http://ablefit.herokuapp.com";
+var siteUrl = process.env.SITEURL + ":" + port || "https://ablefit.herokuapp.com";
 var userAuthUrl = "";
 var getTokenDataString = "";
 
