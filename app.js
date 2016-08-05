@@ -14,14 +14,17 @@ var port = process.env.PORT || 8080;
 var siteUrl = "";
 var userAuthUrl = "";
 var getTokenDataString = "";
+var userApiUrl = "";
 
 var envionmentCheck = function () {
-  if (process.env.SITEURL) {
+  if (process.env.ENVIRONMENT == "dev") {
     siteUrl = process.env.SITEURL + ":" + port;
+    userApiUrl = process.env.SITEURL + ":" + port;
     userAuthUrl = "https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=" + process.env.CLIENT_ID + "&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&scope=heartrate%20profile%20weight&expires_in=604800";
     getTokenDataString = "clientId=" + process.env.CLIENT_ID + "&grant_type=authorization_code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&code=";
   } else {
     siteUrl = "https://ablefit.herokuapp.com";
+    userApiUrl = "https://ablefit.herokuapp.com";
     userAuthUrl = "https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=" + process.env.CLIENT_ID + "&redirect_uri=https%3A%2F%2Fablefit.herokuapp.com%2Fcallback&scope=heartrate%20profile%20weight&expires_in=604800";
     getTokenDataString = "clientId=" + process.env.CLIENT_ID + "&grant_type=authorization_code&redirect_uri=https%3A%2F%2Fablefit.herokuapp.com%2Fcallback&code=";
   }
@@ -96,13 +99,13 @@ app.use('/callback', function (req, res, next) {
       getHeartrate(obj, function (heartrate) {
         if(heartrate.hasOwnProperty("user")){
           apiMsg = "You're authenticated. You can make requests from MAX/MSP to this URL:";
-          apiLink = siteUrl + "/api/" + heartrate.user.access_token;
+          apiLink = userApiUrl + "/api/" + heartrate.user.access_token;
           apiDetails = "The API returns your current heart rate. It updates every 30 seconds. Don't hit it more than that.";
           console.log('siteUrl: ' + siteUrl);
           next();
         } else {
           apiMsg = "Uh oh, something went wrong. Try returning to the homepage and re-authenticating.";
-          apiLink = siteUrl;
+          apiLink = userApiUrl;
           apiDetails = "";
           next();
         }
