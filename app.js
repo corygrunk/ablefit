@@ -10,10 +10,21 @@ var http = require('http');
 var apiLink = "";
 var getUrlToken = "";
 
-var siteUrl = "http://localhost:3000";
+// PROD ENV
+var siteUrl = "http://ablefit.herokuapp.com";
+// DEV ENV
+// var siteUrl = "http://localhost:3000";
 
-var userAuthUrl = "https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=" + process.env.CLIENT_ID +
+// PROD ENV
+var userAuthUrl = "https://www.fitbit.com/oauth2/authorize?response_type=token&client_id=" + process.env.CLIENT_ID + "&redirect_uri=http%3A%2F%2Fablefit.herokuapp.com%2Fcallback&scope=heartrate%20profile%20weight&expires_in=604800";
+// DEV ENV
+// var userAuthUrl = "https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=" + process.env.CLIENT_ID +
 "&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&scope=heartrate%20profile%20weight&expires_in=604800";
+
+// PROD ENV
+var getTokenDataString = "clientId=" + process.env.CLIENT_ID + "&grant_type=authorization_code&redirect_uri=http%3A%2F%2Fablefit.herokuapp.com%2Fcallback&code=" + clientToken;
+// DEV ENV
+// var getTokenDataString = "clientId=" + process.env.CLIENT_ID + "&grant_type=authorization_code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&code=" + clientToken;
 
 var apiEndpoint = "https://api.fitbit.com/1/user/-/profile.json";
 
@@ -30,7 +41,7 @@ var getUserTokens = function (callback) {
     'Authorization': 'Basic ' + process.env.CLIENT_AUTH,
     'Content-Type': 'application/x-www-form-urlencoded'
   },
-  dataString = "clientId=" + process.env.CLIENT_ID + "&grant_type=authorization_code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&code=" + clientToken,
+  dataString = getTokenDataString,
   options = {
       url: 'https://api.fitbit.com/oauth2/token',
       method: 'POST',
