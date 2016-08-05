@@ -9,23 +9,22 @@ var http = require('http');
 
 var apiLink = "";
 var getUrlToken = "";
-var clientToken = "";
 
 var port = process.env.PORT || 8080;
-// PROD ENV
-var siteUrl = "http://ablefit.herokuapp.com";
-// DEV ENV
-// var siteUrl = "http://localhost:3000";
+var siteUrl = process.env.SITEURL + ":" + port || "http://ablefit.herokuapp.com";
+var userAuthUrl = "";
+var getTokenDataString = "";
 
-// PROD ENV
-var userAuthUrl = "https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=" + process.env.CLIENT_ID + "&redirect_uri=https%3A%2F%2Fablefit.herokuapp.com%2Fcallback&scope=heartrate%20profile%20weight&expires_in=604800";
-// DEV ENV
-// var userAuthUrl = "https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=" + process.env.CLIENT_ID + "&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&scope=heartrate%20profile%20weight&expires_in=604800";
-
-// PROD ENV
-var getTokenDataString = "clientId=" + process.env.CLIENT_ID + "&grant_type=authorization_code&redirect_uri=https%3A%2F%2Fablefit.herokuapp.com%2Fcallback&code=" + clientToken;
-// DEV ENV
-// var getTokenDataString = "clientId=" + process.env.CLIENT_ID + "&grant_type=authorization_code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&code=" + clientToken;
+var envionmentCheck = function () {
+  if (process.env.SITEURL) {
+    userAuthUrl = "https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=" + process.env.CLIENT_ID + "&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&scope=heartrate%20profile%20weight&expires_in=604800";
+    getTokenDataString = "clientId=" + process.env.CLIENT_ID + "&grant_type=authorization_code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fcallback&code=";
+  } else {
+    userAuthUrl = "https://www.fitbit.com/oauth2/authorize?response_type=code&client_id=" + process.env.CLIENT_ID + "&redirect_uri=https%3A%2F%2Fablefit.herokuapp.com%2Fcallback&scope=heartrate%20profile%20weight&expires_in=604800";
+    getTokenDataString = "clientId=" + process.env.CLIENT_ID + "&grant_type=authorization_code&redirect_uri=https%3A%2F%2Fablefit.herokuapp.com%2Fcallback&code=";
+  }
+};
+envionmentCheck();
 
 var apiEndpoint = "https://api.fitbit.com/1/user/-/profile.json";
 
@@ -37,7 +36,7 @@ app.use(express.static(__dirname + '/public'));
 
 
 // GET USER TOKENS
-var getUserTokens = function (callback) {
+var getUserTokens = function (urlToken, callback) {
   var headers = {
     'Authorization': 'Basic ' + process.env.CLIENT_AUTH,
     'Content-Type': 'application/x-www-form-urlencoded'
@@ -47,13 +46,12 @@ var getUserTokens = function (callback) {
       url: 'https://api.fitbit.com/oauth2/token',
       method: 'POST',
       headers: headers,
-      body: dataString
+      body: dataString + urlToken
   };
   function callback1(error, response, body) {
       if (!error && response.statusCode == 200) {
         callback(JSON.parse(body));
       } else {
-        console.log(body);
         callback(JSON.parse(body));
       }
   }
@@ -82,30 +80,30 @@ var getHeartrate = function (obj, callback) {
   request(options, callback2);
 };
 
-var parseUrlForClientToken = function (url) {
+var parseUrlForClientToken = function (url, callback) {
   var s = url.split('=');
-  clientToken = s[1];
+  callback(s[1]);
 };
 
 
 // EXPRESS MIDDLEWARE
 
 app.use('/callback', function (req, res, next) {
-  // console.log('Request Type:', req.method);
-  parseUrlForClientToken(req.originalUrl);
-  getUserTokens(function (obj) {
-    getHeartrate(obj, function (heartrate) {
-      if(heartrate.hasOwnProperty("user")){
-        apiMsg = "You're authenticated. You can make requests from MAX/MSP to this URL:";
-        apiLink = siteUrl + "/api/" + heartrate.user.access_token;
-        apiDetails = "The API returns your current heart rate. It updates every 30 seconds.";
-        next();
-      } else {
-        apiMsg = "Uh oh, something went wrong. Try returning to the homepage and re-authenticating.";
-        apiLink = siteUrl;
-        apiDetails = "";
-        next();
-      }
+  parseUrlForClientToken(req.originalUrl, function (urlToken) {
+    getUserTokens(urlToken, function (obj) {
+      getHeartrate(obj, function (heartrate) {
+        if(heartrate.hasOwnProperty("user")){
+          apiMsg = "You're authenticated. You can make requests from MAX/MSP to this URL:";
+          apiLink = siteUrl + "/api/" + heartrate.user.access_token;
+          apiDetails = "The API returns your current heart rate. It updates every 30 seconds.";
+          next();
+        } else {
+          apiMsg = "Uh oh, something went wrong. Try returning to the homepage and re-authenticating.";
+          apiLink = siteUrl;
+          apiDetails = "";
+          next();
+        }
+      });
     });
   });
 });
