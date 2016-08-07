@@ -6,7 +6,7 @@ html body {
 }
 p {
   max-width: 600px;
-  margin: 0 auto;
+  margin: 15px auto;
   line-height: 180%;
 }
 pre {
